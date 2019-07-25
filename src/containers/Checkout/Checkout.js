@@ -2,6 +2,8 @@ import React from 'react';
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import { Route } from 'react-router-dom';
 import ContactData from './ContactData/ContactData';
+import { connect } from 'react-redux';
+import { strictEqual } from 'assert';
 
 
 class Checkout extends React.Component{
@@ -36,26 +38,35 @@ class Checkout extends React.Component{
     }
 
     render(){
-        console.log(this.state.ingredients)
-        let checkout = null;
-        if (this.state.ingredients){
-            checkout = ( 
-                <div>
-                    <CheckoutSummary
-                        ingredients={this.state.ingredients}
-                        checkoutCancelled={this.checkoutCancelledHandler}
-                        checkoutContinued={this.checkoutContinuedHandler}/>
-                </div>
-            )
-        }
+        // let checkout = null;
+        // if (this.props.ing){
+        //     checkout = ( 
+        //         <div>
+        //             <CheckoutSummary
+        //                 ingredients={this.state.ingredients}
+        //                 checkoutCancelled={this.checkoutCancelledHandler}
+        //                 checkoutContinued={this.checkoutContinuedHandler}/>
+        //         </div>
+        //     )
+        // }
 
         return (
             <React.Fragment>
-                {checkout}
-                <Route path={this.props.match.path + '/contact-data'} render={() => (<ContactData ingredients={this.state.ingredients} price={this.state.totalPrice} {...this.props}/>)} />
+                <CheckoutSummary
+                    ingredients={this.props.ing}
+                    checkoutCancelled={this.checkoutCancelledHandler}
+                    checkoutContinued={this.checkoutContinuedHandler}/>
+                <Route path={this.props.match.path + '/contact-data'} render={() => (<ContactData ingredients={this.props.ing} price={this.props.total} {...this.props}/>)} />
             </React.Fragment>
         )
     }
 }
 
-export default Checkout;
+const mapStateToProps = (state) => {
+    return {
+        ing: state.ing.ingredients,
+        total: state.total.totalPrice
+    }
+}
+
+export default connect(mapStateToProps)(Checkout);

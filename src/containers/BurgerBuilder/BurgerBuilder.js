@@ -103,6 +103,9 @@ class BurgerBuilder extends React.Component {
     // }
 
     render(){
+
+        console.log("checking redux store")
+        console.log(this.props.ing);
         const disabledInfo = {
             ...this.props.ing
         }
@@ -113,7 +116,7 @@ class BurgerBuilder extends React.Component {
         let orderSummary = null;
         let burger = this.state.error ? <p>Ingredients can't be loaded</p> : <Spinner />;
 
-        if (this.state.ingredients){
+        if (this.props.ing){
             orderSummary =  <OrderSummary 
                         ingredients={this.props.ing}
                         purchaseCancelled={this.purchaseCancelHandler}

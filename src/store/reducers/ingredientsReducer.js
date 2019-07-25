@@ -14,7 +14,7 @@ const ingredientsReducer = (state = initialState, action) => {
         case actionTypes.ADD_INGREDIENT :
             let ingredientCount = state.ingredients[action.ingType];
             const updatedCount = ingredientCount + 1;
-            const updatedIngredients = {...this.state.ingredients};
+            const updatedIngredients = {...state.ingredients};
             updatedIngredients[action.ingType] = updatedCount;
             return {ingredients: updatedIngredients};
 
@@ -25,7 +25,7 @@ const ingredientsReducer = (state = initialState, action) => {
             //     return;
             // }
             const updatedStoreIngredients = {...state.ingredients};
-            updatedStoreIngredients[action.action.ingType] = updatedSubCount;
+            updatedStoreIngredients[action.ingType] = updatedSubCount;
             return {ingredients: updatedStoreIngredients}
         default: return state;
     }
