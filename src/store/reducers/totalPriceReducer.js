@@ -7,11 +7,15 @@ const initialState = {
 const totalPriceReducer = (state=initialState, action) => {
     switch(action.type){
         case actionTypes.ADD_TO_TOTAL :
-            let updatedTotal = state.totalPrice + action.priceAddition
-            return {...state, totalPrice: updatedTotal};
+            return {
+                ...state,
+                totalPrice: state.totalPrice + action.priceAddition
+            }
         case actionTypes.SUBTRACT_FROM_TOTAL :
-            let updatedSubTotal = state.totalPrice - action.priceSubtraction
-            return {...state, totalPrice: updatedSubTotal}
+            return {
+                ...state,
+                totalPrice: state.totalPrice - action.priceSubtraction
+            }
         default: return state
     }
 }

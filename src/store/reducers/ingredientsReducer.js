@@ -12,23 +12,24 @@ const initialState = {
 const ingredientsReducer = (state = initialState, action) => {
     switch (action.type){
         case actionTypes.ADD_INGREDIENT :
-            let ingredientCount = state.ingredients[action.ingType];
-            const updatedCount = ingredientCount + 1;
-            const updatedIngredients = {...state.ingredients};
-            updatedIngredients[action.ingType] = updatedCount;
-            return {ingredients: updatedIngredients};
+            return {
+                ...state, 
+                ingredients: {
+                    ...state.ingredients,
+                    [action.ingType]: state.ingredients[action.ingType] + 1
+                }
+            }
 
         case actionTypes.REMOVE_INGREDIENT :
-            let ingredientSubCount = state.ingredients[action.ingType];
-            const updatedSubCount = ingredientSubCount - 1;
-            // if (updatedCount < 0) {
-            //     return;
-            // }
-            const updatedStoreIngredients = {...state.ingredients};
-            updatedStoreIngredients[action.ingType] = updatedSubCount;
-            return {ingredients: updatedStoreIngredients}
-        default: return state;
+            return {
+                ...state, 
+                ingredients: {
+                    ...state.ingredients,
+                    [action.ingType]: state.ingredients[action.ingType] - 1
+                    }
+                }
     }
+    return state;
 };
 
 export default ingredientsReducer;
