@@ -5,6 +5,9 @@ import classes from './ContactData.module.css';
 import axios from '../../../axios-orders';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
+import * as burgerBuilderActions from '../../../store/actions';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+
 
 class ContactData extends React.Component {
 
@@ -93,8 +96,7 @@ class ContactData extends React.Component {
                 touched: false
             }
         },
-        formIsValid: false,
-        loading: false
+        formIsValid: false
     }
 
     checkValidity = (value, rules) => {
@@ -111,13 +113,21 @@ class ContactData extends React.Component {
             isValid = value.length <= rules.minLength && isValid;
         }
 
+        if (rules.isEmail) {
+            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+            isValid = pattern.test(value) && isValid
+        }
+
+        if (rules.isNumeric) {
+            const pattern = /^\d+$/;
+            isValid = pattern.test(value) && isValid
+        }
+
         return isValid
     }
 
     orderHandler =(event) => {
         event.preventDefault();
-
-        this.setState({loading: true});
         const formData = {};
         for (let formElementIdentifier in this.state.orderForm){
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
@@ -125,19 +135,11 @@ class ContactData extends React.Component {
         const order = {
             ingredients: this.props.ing,
             price: this.props.total,
-            orderData: formData
+            orderData: formData,
+            userId: this.props.userId
         }
-        axios.post('/orders.json', order)
-            .then(res => {
-                console.log("Order Success")
-                console.log(res)
-                this.setState({loading: false, purchasing: false});
-                this.props.history.push('/');
-            })
-            .catch(er =>{ 
-                console.log("error: " + er)
-                this.setState({loading: false, purchasing: false})
-            })
+
+        this.props.ON_SUBMIT_ORDER(order, this.props.token);
     }
 
     inputChangedHandler = (e, inputIdentifier) => {
@@ -159,7 +161,10 @@ class ContactData extends React.Component {
         this.setState({orderForm: updatedForm, formIsValid: formIsValid})
     }
 
+
     render(){
+
+
         const formElements = [];
         for (let key in this.state.orderForm){
             formElements.push({
@@ -167,7 +172,7 @@ class ContactData extends React.Component {
                 config: this.state.orderForm[key]
             })
         }
-        let form = (
+        let form = this.props.loading? <Spinner /> : (
             <form onSubmit={this.orderHandler}>
             {formElements.map(el => (
                 <Input 
@@ -183,7 +188,7 @@ class ContactData extends React.Component {
             <Button disabled={!this.state.formIsValid} btntype="Success"> ORDER</Button>
         </form>
         );
-        if (this.state.loading) form = <Spinner />
+
         return (
             <div className={classes.ContactData}>
                 <h4> Enter your Contact Data</h4>
@@ -196,8 +201,17 @@ class ContactData extends React.Component {
 const mapStateToProps = (state) => {
     return {
         ing: state.ing.ingredients,
-        total: state.total.totalPrice
+        total: state.total.totalPrice,
+        loading: state.order.loading,
+        token: state.auth.token,
+        userId: state.auth.userId
     }
 }
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => {
+    return {
+        ON_SUBMIT_ORDER: (order, token) => dispatch(burgerBuilderActions.trySubmitOrder(order, token))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
