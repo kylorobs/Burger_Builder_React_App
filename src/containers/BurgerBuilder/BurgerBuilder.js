@@ -101,7 +101,6 @@ class BurgerBuilder extends React.Component {
                 </React.Fragment>);
         }        
         
-        // if (this.state.loading) orderSummary = <Spinner />
         console.log(this.props.ing)
         return (
             <React.Fragment>
