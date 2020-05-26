@@ -6,6 +6,7 @@ import * as actions from '../../store/actions';
 import { connect } from 'react-redux';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import { Redirect } from 'react-router-dom';
+import { updateObject, checkValidity } from '../../shared/utility';
 
 class Auth extends React.Component {
 
@@ -50,43 +51,14 @@ class Auth extends React.Component {
 
     }
 
-    checkValidity = (value, rules) => {
-        let isValid = true;
-        if (rules.required){
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength){
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength){
-            isValid = value.length <= rules.minLength && isValid;
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid
-    }
 
     inputChangedHandler = (event, controlName) => {
-        const updatedControls = {
-            ...this.state.controls,
-            [controlName]: {
-                ...this.state.controls[controlName],
-                touched: true,
-                value: event.target.value,
-                valid: this.checkValidity(event.target.value, this.state.controls[controlName].validation)
-            }
-        }
+        const updatedControl = updateObject(this.state.controls[controlName], {
+            touched: true,
+            value: event.target.value,
+            valid: checkValidity(event.target.value, this.state.controls[controlName].validation)
+        })
+        const updatedControls = updateObject(this.state.controls, {[controlName]: updatedControl})
         this.setState({controls: updatedControls});
     }
 
@@ -96,10 +68,7 @@ class Auth extends React.Component {
     }
 
     toggleSignUp = () => {
-        console.log("toggle")
         this.setState(prevState => {
-            console.log('Previous State')
-            console.log(prevState)
             return {
                 isSignUp: !prevState.isSignUp
             };
@@ -115,7 +84,6 @@ class Auth extends React.Component {
             })
         }
 
-        console.log(this.state.isSignUp)
 
         let form = formElements.map(el => (
             <Input 

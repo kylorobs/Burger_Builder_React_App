@@ -18,7 +18,7 @@ const INGREDIENT_PRICES = {
     meat: 0
 }
 
-class BurgerBuilder extends React.Component { 
+export class BurgerBuilder extends React.Component { 
     
     state = {
         purchasing: false, 
@@ -101,8 +101,6 @@ class BurgerBuilder extends React.Component {
                 </React.Fragment>);
         }        
         
-        // if (this.state.loading) orderSummary = <Spinner />
-        console.log(this.props.ing)
         return (
             <React.Fragment>
                 <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>

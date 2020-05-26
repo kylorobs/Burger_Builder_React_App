@@ -3,16 +3,6 @@ import classes from './Order.module.css'
 
 const order = (props) => {
 
-    // const ingredients = Object.keys(props.ingredients)
-    //     .map(ingKey => {
-    //         return [...Array(props.ingredients[ingKey])].map((_, i) => {
-    //         return <BurgerIngredient key = {ingKey + i} type={ingKey}/>
-    //         })
-    //     } )
-    //     .reduce((arr, el) => {
-    //         return arr.concat(el)
-    //     }, []);
-
     const ingredients = [];
     for ( let ingredientName in props.ingredients){
         ingredients.push(

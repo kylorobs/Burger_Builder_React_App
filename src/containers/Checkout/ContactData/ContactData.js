@@ -7,6 +7,8 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import * as burgerBuilderActions from '../../../store/actions';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import { updateObject, checkValidity } from '../../../shared/utility'; 
+
 
 
 class ContactData extends React.Component {
@@ -99,33 +101,6 @@ class ContactData extends React.Component {
         formIsValid: false
     }
 
-    checkValidity = (value, rules) => {
-        let isValid = true;
-        if (rules.required){
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength){
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength){
-            isValid = value.length <= rules.minLength && isValid;
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid
-    }
-
     orderHandler =(event) => {
         event.preventDefault();
         const formData = {};
@@ -143,16 +118,16 @@ class ContactData extends React.Component {
     }
 
     inputChangedHandler = (e, inputIdentifier) => {
-        const updatedForm = {
-            ...this.state.orderForm
-        }
-        const updatedFormElement = {
-            ...updatedForm[inputIdentifier]
-        }
-        updatedFormElement.value = e.target.value;
-        updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
-        updatedFormElement.touched = true;
-        updatedForm[inputIdentifier] = updatedFormElement;
+
+        let updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
+            value:e.target.value,
+            valid: checkValidity(e.target.value, this.state.orderForm[inputIdentifier].validation),
+            touched: true
+        });
+
+        const updatedForm = updateObject(this.state.orderForm, {
+            [inputIdentifier]: updatedFormElement
+        })
 
         let formIsValid = true;
         for (let inputIdentifier in updatedForm){

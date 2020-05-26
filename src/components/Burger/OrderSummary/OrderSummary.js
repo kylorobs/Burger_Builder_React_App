@@ -2,11 +2,6 @@ import React from 'react';
 import Button from '../../UI/Button/Button'
 
 class OrderSummary extends React.Component {
-//This could be a functional component, used just to check if component was updating
-
-    componentDidUpdate(){
-        console.log('[OrderSummary] will update')
-    }
 
     render(){
         const ingredientSummary = Object.keys(this.props.ingredients)
