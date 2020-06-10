@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import Button from '../../../components/UI/Button/Button';
 import classes from './ContactData.module.css';
@@ -11,10 +11,9 @@ import { updateObject, checkValidity } from '../../../shared/utility';
 
 
 
-class ContactData extends React.Component {
-
-    state = {
-        orderForm: {
+const ContactData = props => {
+    const [formIsValid, setFormIsValid] = useState(false);
+    const [orderForm, setOrderForm] = useState({
             name: {
                 elementType: 'input',
                 elementConfig: {
@@ -97,62 +96,60 @@ class ContactData extends React.Component {
                 valid: true,
                 touched: false
             }
-        },
-        formIsValid: false
-    }
+        })
 
-    orderHandler =(event) => {
+
+    const orderHandler =(event) => {
         event.preventDefault();
         const formData = {};
-        for (let formElementIdentifier in this.state.orderForm){
-            formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
+        for (let formElementIdentifier in orderForm){
+            formData[formElementIdentifier] = orderForm[formElementIdentifier].value;
         }
         const order = {
-            ingredients: this.props.ing,
-            price: this.props.total,
+            ingredients: props.ing,
+            price: props.total,
             orderData: formData,
-            userId: this.props.userId
+            userId: props.userId
         }
 
-        this.props.ON_SUBMIT_ORDER(order, this.props.token);
+        props.ON_SUBMIT_ORDER(order, props.token);
     }
 
-    inputChangedHandler = (e, inputIdentifier) => {
+    const inputChangedHandler = (e, inputIdentifier) => {
 
-        let updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
+        let updatedFormElement = updateObject(orderForm[inputIdentifier], {
             value:e.target.value,
-            valid: checkValidity(e.target.value, this.state.orderForm[inputIdentifier].validation),
+            valid: checkValidity(e.target.value, orderForm[inputIdentifier].validation),
             touched: true
         });
 
-        const updatedForm = updateObject(this.state.orderForm, {
+        const updatedForm = updateObject(orderForm, {
             [inputIdentifier]: updatedFormElement
         })
 
-        let formIsValid = true;
+        let formValid = true;
         for (let inputIdentifier in updatedForm){
-            formIsValid = updatedForm[inputIdentifier].valid && formIsValid
+            formValid = updatedForm[inputIdentifier].valid && formValid
         }
-        this.setState({orderForm: updatedForm, formIsValid: formIsValid})
+        setOrderForm(updatedForm)
+        setFormIsValid(formValid)
     }
 
 
-    render(){
-
 
         const formElements = [];
-        for (let key in this.state.orderForm){
+        for (let key in orderForm){
             formElements.push({
                 id: key,
-                config: this.state.orderForm[key]
+                config: orderForm[key]
             })
         }
-        let form = this.props.loading? <Spinner /> : (
-            <form onSubmit={this.orderHandler}>
+        let form = props.loading? <Spinner /> : (
+            <form onSubmit={orderHandler}>
             {formElements.map(el => (
                 <Input 
                     key={el.id}
-                    changed={(e) => this.inputChangedHandler(e, el.id)}
+                    changed={(e) => inputChangedHandler(e, el.id)}
                     elementType={el.config.elementType} 
                     elementConfig={el.config.elementConfig}
                     invalid={!el.config.valid} 
@@ -160,7 +157,7 @@ class ContactData extends React.Component {
                     touched={el.config.touched}
                     value ={el.config.value} />
             ))}
-            <Button disabled={!this.state.formIsValid} btntype="Success"> ORDER</Button>
+            <Button disabled={!formIsValid} btntype="Success"> ORDER</Button>
         </form>
         );
 
@@ -171,7 +168,6 @@ class ContactData extends React.Component {
             </div>
         )
     }
-}
 
 const mapStateToProps = (state) => {
     return {
